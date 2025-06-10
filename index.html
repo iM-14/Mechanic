@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة كراج الميكانيك</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            direction: rtl;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 90%;
+            max-width: 1200px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .login-screen {
+            text-align: center;
+            max-width: 4000px;
+            margin: 0 auto;
+        }
+
+        .main-screen {
+            display: none;
+        }
+
+        .public-view {
+            display: block;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .view-toggle {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #1abc9c;
+            color: #1abc9c;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: #1abc9c;
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
+        }
+
+        .edit-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .edit-form.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1abc9c;
+            box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 188, 156, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .btn-success {
+        background: linear-gradient(135deg, #2ed573 0%, #001a35 100%);
+        margin-top: 31px; 
+    }
+
+        .employee-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-right: 5px solid #1abc9c;
+        }
+
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .employee-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #1abc9c;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #333;
+            margin-top: 0.3rem;
+        }
+
+        .employee-code {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .add-employee-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .employee-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <!-- العرض العام لقائمة الموظفين -->
+        <div id="publicView" class="public-view">
+            <h1>🔧 قائمة موظفي كراج الميكانيك</h1>
+            
+            <div class="view-toggle">
+                <button class="toggle-btn active" onclick="showPublicView()">عرض الموظفين</button>
+                <button class="toggle-btn" onclick="showLoginScreen()">إدارة النظام</button>
+            </div>
+            
+            <div id="publicEmployeesList">
+                <div id="publicEmployeesContainer"></div>
+            </div>
+        </div>
+
+        <!-- شاشة تسجيل الدخول -->
+        <div id="loginScreen" class="login-screen" style="display: none;">
+            <h1>🔧 إدارة كراج الميكانيك</h1>
+            <div class="view-toggle">
+                <button class="toggle-btn" onclick="showPublicView()">عرض الموظفين</button>
+                <button class="toggle-btn active">إدارة النظام</button>
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور">
+            </div>
+            <button class="btn" onclick="login()">دخول</button>
+        </div>
+
+        <!-- لوحة الإدارة -->
+        <div id="adminPanel" class="admin-panel">
+            <div class="header">
+                <h1>🔧 لوحة إدارة الكراج</h1>
+                <button class="btn logout-btn" onclick="logout()">خروج</button>
+            </div>
+
+            <!-- نموذج إضافة موظف جديد -->
+            <div class="add-employee-form">
+                <h2>إضافة موظف جديد</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employeeName">اسم الموظف:</label>
+                        <input type="text" id="employeeName" placeholder="فلان بن فلان">
+                    </div>
+                    <div class="form-group">
+                        <label for="employeeCode">كود الموظف:</label>
+                        <select id="employeeCode">
+                            <option value="">اختر الكود</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="employeeRank">الرتبة:</label>
+                        <select id="employeeRank">
+                            <option value="">اختر الرتبة</option>
+                            <option value="مدير الكراج">مدير الكراج</option>
+                            <option value="نائب الكراج">نائب الكراج</option>
+                            <option value="مشرف عام">مشرف عام</option>
+                            <option value="ميكانيكي">ميكانيكي</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employeeLevel">المستوى:</label>
+                        <select id="employeeLevel">
+                            <option value="">اختر المستوى</option>
+                            <option value="1">مستوى 1</option>
+                            <option value="2">مستوى 2</option>
+                            <option value="3">مستوى 3</option>
+                            <option value="4">مستوى 4</option>
+                            <option value="5">مستوى 5</option>
+                            <option value="6">مستوى 6</option>
+                            <option value="7">مستوى 7</option>
+                            <option value="8">مستوى 8</option>
+                            <option value="9">مستوى 9</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-success" onclick="addEmployee()">إضافة موظف</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قائمة الموظفين للإدارة -->
+            <div id="adminEmployeesList">
+                <h2>إدارة الموظفين</h2>
+                <div id="adminEmployeesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إشعار -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // كلمة المرور
+        const ADMIN_PASSWORD = "admin123";
+        
+        // رابط Discord Webhook (يجب استبداله برابط حقيقي)
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1381873227667734568/LA9E46ASKOELE7SuI-N-sXQ2pN9EIZv3ZSsQAkeDIJdEjmwTG_AJ3M52_Uxe-AjajL3r";
+        
+        // قائمة الموظفين
+        let employees = JSON.parse(localStorage.getItem('employees')) || [];
+        
+        // الأكواد المستخدمة
+        let usedCodes = new Set(employees.map(emp => emp.code));
+
+        // عرض الشاشة العامة
+        function showPublicView() {
+            document.getElementById('publicView').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            displayPublicEmployees();
+        }
+
+        // عرض شاشة تسجيل الدخول
+        function showLoginScreen() {
+            document.getElementById('publicView').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        // تسجيل الدخول
+        function login() {
+            const password = document.getElementById('password').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('publicView').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('adminPanel').classList.add('fade-in');
+                initializeApp();
+            } else {
+                showNotification('كلمة المرور غير صحيحة!', 'error');
+            }
+        }
+
+        // تسجيل الخروج
+        function logout() {
+            document.getElementById('publicView').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('password').value = '';
+            showPublicView();
+        }
+
+        // تهيئة التطبيق
+        function initializeApp() {
+            generateCodeOptions();
+            displayAdminEmployees();
+        }
+
+        // إنشاء خيارات الأكواد
+        function generateCodeOptions() {
+            const codeSelect = document.getElementById('employeeCode');
+            codeSelect.innerHTML = '<option value="">اختر الكود</option>';
+            
+            for (let i = 1; i <= 200; i++) {
+                const code = `G-${i.toString().padStart(3, '0')}`;
+                if (!usedCodes.has(code)) {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = code;
+                    codeSelect.appendChild(option);
+                }
+            }
+        }
+
+        // إضافة موظف جديد
+        function addEmployee() {
+            const name = document.getElementById('employeeName').value.trim();
+            const code = document.getElementById('employeeCode').value;
+            const rank = document.getElementById('employeeRank').value;
+            const level = document.getElementById('employeeLevel').value;
+
+            if (!name || !code || !rank || !level) {
+                showNotification('يرجى ملء جميع الحقول!', 'error');
+                return;
+            }
+
+            const employee = {
+                id: Date.now(),
+                name,
+                code,
+                rank,
+                level,
+                dateAdded: new Date().toLocaleDateString('ar-SA')
+            };
+
+            employees.push(employee);
+            usedCodes.add(code);
+            saveEmployees();
+            displayAdminEmployees();
+            displayPublicEmployees();
+            generateCodeOptions();
+            clearForm();
+            
+            // إرسال لوق إلى Discord
+            sendDiscordLog(`تم إضافة موظف جديد: ${name} - ${code} - ${rank} - مستوى ${level}`, 'إضافة');
+            
+            showNotification('تم إضافة الموظف بنجاح!', 'success');
+        }
+
+        // عرض الموظفين للعامة
+        function displayPublicEmployees() {
+            const container = document.getElementById('publicEmployeesContainer');
+            container.innerHTML = '';
+
+            employees.forEach((employee, index) => {
+                const employeeCard = document.createElement('div');
+                employeeCard.className = 'employee-card slide-in';
+                employeeCard.style.animationDelay = `${index * 0.1}s`;
+                
+                employeeCard.innerHTML = `
+                    <div class="employee-info">
+                        <div class="info-item">
+                            <div class="info-label">الاسم</div>
+                            <div class="info-value">${employee.name}</div>
+                            <div class="employee-code">${employee.code}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">الرتبة</div>
+                            <div class="info-value">${employee.rank}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">المستوى</div>
+                            <div class="info-value">مستوى ${employee.level}</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(employeeCard);
+            });
+        }
+
+        // عرض الموظفين للإدارة
+        function displayAdminEmployees() {
+            const container = document.getElementById('adminEmployeesContainer');
+            container.innerHTML = '';
+
+            employees.forEach((employee, index) => {
+                const employeeCard = document.createElement('div');
+                employeeCard.className = 'employee-card slide-in';
+                employeeCard.style.animationDelay = `${index * 0.1}s`;
+                
+                employeeCard.innerHTML = `
+                    <div class="employee-info">
+                        <div class="info-item">
+                            <div class="info-label">الاسم</div>
+                            <div class="info-value">${employee.name}</div>
+                            <div class="employee-code">${employee.code}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">الرتبة</div>
+                            <div class="info-value">${employee.rank}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">المستوى</div>
+                            <div class="info-value">مستوى ${employee.level}</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn" onclick="editEmployee(${employee.id})">تعديل</button>
+                        <button class="btn btn-success" onclick="promoteEmployee(${employee.id})">ترقية</button>
+                        <button class="btn btn-danger" onclick="removeEmployee(${employee.id})">طرد</button>
+                    </div>
+                    <div id="editForm${employee.id}" class="edit-form">
+                        <h3>تعديل بيانات الموظف</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>الاسم:</label>
+                                <input type="text" id="editName${employee.id}" value="${employee.name}">
+                            </div>
+                            <div class="form-group">
+                                <label>الكود:</label>
+                                <select id="editCode${employee.id}">
+                                    <option value="${employee.code}">${employee.code}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>الرتبة:</label>
+                                <select id="editRank${employee.id}">
+                                    <option value="مدير الكراج" ${employee.rank === 'مدير الكراج' ? 'selected' : ''}>مدير الكراج</option>
+                                    <option value="نائب الكراج" ${employee.rank === 'نائب الكراج' ? 'selected' : ''}>نائب الكراج</option>
+                                    <option value="مشرف عام" ${employee.rank === 'مشرف عام' ? 'selected' : ''}>مشرف عام</option>
+                                    <option value="ميكانيكي" ${employee.rank === 'ميكانيكي' ? 'selected' : ''}>ميكانيكي</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>المستوى:</label>
+                                <select id="editLevel${employee.id}">
+                                    ${[1,2,3,4,5,6,7,8,9].map(level => 
+                                        `<option value="${level}" ${employee.level == level ? 'selected' : ''}>مستوى ${level}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success" onclick="saveEmployeeEdit(${employee.id})">حفظ</button>
+                                <button class="btn btn-danger" onclick="cancelEdit(${employee.id})">إلغاء</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(employeeCard);
+            });
+        }
+
+        // ترقية موظف
+        function promoteEmployee(id) {
+            const employee = employees.find(emp => emp.id === id);
+            if (!employee) return;
+
+            const currentLevel = parseInt(employee.level);
+            if (currentLevel < 9) {
+                employee.level = (currentLevel + 1).toString();
+                saveEmployees();
+                displayAdminEmployees();
+                displayPublicEmployees();
+                
+                sendDiscordLog(`تم ترقية الموظف: ${employee.name} - ${employee.code} إلى مستوى ${employee.level}`, 'ترقية');
+                showNotification(`تم ترقية ${employee.name} إلى مستوى ${employee.level}!`, 'success');
+            } else {
+                showNotification('الموظف في أعلى مستوى بالفعل!', 'error');
+            }
+        }
+
+        // طرد موظف
+        function removeEmployee(id) {
+            const employee = employees.find(emp => emp.id === id);
+            if (!employee) return;
+
+            if (confirm(`هل أنت متأكد من طرد الموظف ${employee.name}؟`)) {
+                usedCodes.delete(employee.code);
+                employees = employees.filter(emp => emp.id !== id);
+                saveEmployees();
+                displayAdminEmployees();
+                displayPublicEmployees();
+                generateCodeOptions();
+                
+                sendDiscordLog(`تم طرد الموظف: ${employee.name} - ${employee.code}`, 'طرد');
+                showNotification(`تم طرد ${employee.name} من الكراج!`, 'success');
+            }
+        }
+
+        // حفظ البيانات
+        function saveEmployees() {
+            localStorage.setItem('employees', JSON.stringify(employees));
+        }
+
+        // مسح النموذج
+        function clearForm() {
+            document.getElementById('employeeName').value = '';
+            document.getElementById('employeeCode').value = '';
+            document.getElementById('employeeRank').value = '';
+            document.getElementById('employeeLevel').value = '';
+        }
+
+        // إرسال لوق إلى Discord
+        async function sendDiscordLog(message, action) {
+            const embed = {
+                title: `🔧 ${action} في كراج الميكانيك`,
+                description: message,
+                color: action === 'إضافة' ? 0x00ff00 : action === 'ترقية' ? 0x0099ff : 0xff0000,
+                timestamp: new Date().toISOString(),
+                footer: {
+                    text: "نظام إدارة كراج الميكانيك"
+                }
+            };
+
+            try {
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        embeds: [embed]
+                    })
+                });
+            } catch (error) {
+                console.log('خطأ في إرسال اللوق إلى Discord:', error);
+            }
+        }
+
+        // عرض الإشعارات
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type === 'error' ? 'btn-danger' : 'btn-success'}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // تعديل موظف
+        function editEmployee(id) {
+            const editForm = document.getElementById(`editForm${id}`);
+            editForm.classList.toggle('show');
+            
+            // تحديث خيارات الكود المتاحة
+            const codeSelect = document.getElementById(`editCode${id}`);
+            const employee = employees.find(emp => emp.id === id);
+            codeSelect.innerHTML = `<option value="${employee.code}">${employee.code}</option>`;
+            
+            for (let i = 1; i <= 200; i++) {
+                const code = `G-${i.toString().padStart(3, '0')}`;
+                if (!usedCodes.has(code) && code !== employee.code) {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = code;
+                    codeSelect.appendChild(option);
+                }
+            }
+        }
+
+        // حفظ تعديل الموظف
+        function saveEmployeeEdit(id) {
+            const employee = employees.find(emp => emp.id === id);
+            const oldCode = employee.code;
+            
+            const newName = document.getElementById(`editName${id}`).value.trim();
+            const newCode = document.getElementById(`editCode${id}`).value;
+            const newRank = document.getElementById(`editRank${id}`).value;
+            const newLevel = document.getElementById(`editLevel${id}`).value;
+
+            if (!newName || !newCode || !newRank || !newLevel) {
+                showNotification('يرجى ملء جميع الحقول!', 'error');
+                return;
+            }
+
+            // تحديث الأكواد المستخدمة
+            if (oldCode !== newCode) {
+                usedCodes.delete(oldCode);
+                usedCodes.add(newCode);
+            }
+
+            employee.name = newName;
+            employee.code = newCode;
+            employee.rank = newRank;
+            employee.level = newLevel;
+
+            saveEmployees();
+            displayAdminEmployees();
+            displayPublicEmployees();
+            generateCodeOptions();
+            
+            sendDiscordLog(`تم تعديل بيانات الموظف: ${newName} - ${newCode} - ${newRank} - مستوى ${newLevel}`, 'تعديل');
+            showNotification('تم تعديل بيانات الموظف بنجاح!', 'success');
+        }
+
+        // إلغاء التعديل
+        function cancelEdit(id) {
+            const editForm = document.getElementById(`editForm${id}`);
+            editForm.classList.remove('show');
+        }
+
+        // التعامل مع Enter في حقل كلمة المرور
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // تهيئة الأكواد عند تحميل الصفحة
+        window.onload = function() {
+            // تحديث الأكواد المستخدمة من البيانات المحفوظة
+            usedCodes = new Set(employees.map(emp => emp.code));
+            // عرض قائمة الموظفين العامة عند التحميل
+            displayPublicEmployees();
+        };
+    </script>
+</body>
+</html>
