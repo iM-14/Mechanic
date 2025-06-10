@@ -430,6 +430,8 @@
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('adminPanel').classList.add('fade-in');
                 initializeApp();
+                // إرسال لوق تسجيل الدخول إلى Discord
+                sendDiscordLog('تم تسجيل الدخول إلى لوحة الإدارة', 'تسجيل دخول');
             } else {
                 showNotification('كلمة المرور غير صحيحة!', 'error');
             }
@@ -441,6 +443,8 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('password').value = '';
+            // إرسال لوق تسجيل الخروج إلى Discord
+            sendDiscordLog('تم تسجيل الخروج من لوحة الإدارة', 'تسجيل خروج');
             showPublicView();
         }
 
@@ -506,7 +510,14 @@
             const container = document.getElementById('publicEmployeesContainer');
             container.innerHTML = '';
 
-            employees.forEach((employee, index) => {
+            // ترتيب الموظفين حسب الكود
+            const sortedEmployees = [...employees].sort((a, b) => {
+                const codeA = parseInt(a.code.replace('G-', ''));
+                const codeB = parseInt(b.code.replace('G-', ''));
+                return codeA - codeB;
+            });
+
+            sortedEmployees.forEach((employee, index) => {
                 const employeeCard = document.createElement('div');
                 employeeCard.className = 'employee-card slide-in';
                 employeeCard.style.animationDelay = `${index * 0.1}s`;
@@ -538,7 +549,14 @@
             const container = document.getElementById('adminEmployeesContainer');
             container.innerHTML = '';
 
-            employees.forEach((employee, index) => {
+            // ترتيب الموظفين حسب الكود
+            const sortedEmployees = [...employees].sort((a, b) => {
+                const codeA = parseInt(a.code.replace('G-', ''));
+                const codeB = parseInt(b.code.replace('G-', ''));
+                return codeA - codeB;
+            });
+
+            sortedEmployees.forEach((employee, index) => {
                 const employeeCard = document.createElement('div');
                 employeeCard.className = 'employee-card slide-in';
                 employeeCard.style.animationDelay = `${index * 0.1}s`;
